@@ -33,8 +33,8 @@ export class Request {
             error => Promise.reject(error)
         );
         this.axiosInstance.interceptors.response.use(
-            (res): AxiosResponse<ResponseResult> => {
-                return res
+            (res) => {
+                return res.data;
             },
             (error: AxiosError) => {
                 switch (error.response?.status) {
@@ -111,7 +111,7 @@ export class Request {
     }
 
     // 定义请求方法
-    public request(config: AxiosRequestConfig): Promise<AxiosResponse> {
+    public request(config: AxiosRequestConfig): Promise<ResponseResult> {
         return this.axiosInstance.request(config);
     }
 }
