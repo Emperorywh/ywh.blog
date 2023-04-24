@@ -1,6 +1,8 @@
-import axios, { AxiosError, type AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
 import { ElNotification } from 'element-plus';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 /**
  * 后端返回的数据格式
  */
@@ -24,6 +26,7 @@ export class Request {
         this.axiosInstance = axios.create(Object.assign(this.baseConfig, config));
         this.axiosInstance.interceptors.request.use(
             reqConfig => {
+                NProgress.inc();
                 const token = localStorage.getItem('USER_TOKEN');
                 if (token) {
                     reqConfig.headers!.Authorization = token;
@@ -34,9 +37,11 @@ export class Request {
         );
         this.axiosInstance.interceptors.response.use(
             (res) => {
+                NProgress.done();
                 return res.data;
             },
             (error: AxiosError) => {
+                NProgress.done();
                 switch (error.response?.status) {
                     case 400:
                         ElNotification({
