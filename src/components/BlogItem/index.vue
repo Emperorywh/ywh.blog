@@ -1,7 +1,7 @@
 <template>
-    <div class="blog-item-container">
+    <div class="blog-item-container" @click="onBlogDetail">
         <div class="blog-title">
-            <a href="#">{{ props.blog.title }}</a>
+            <a>{{ props.blog.title }}</a>
         </div>
         <el-image v-if="props.blog.cover" class="blog-cover" :src="props.blog.cover" fit="cover" />
         <div class="blog-info">
@@ -28,12 +28,22 @@
 
 <script lang="ts" setup>
 import type { IBlog } from '@/api/blog';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 interface IProps {
     blog: IBlog
 }
 
 const props = defineProps<IProps>();
+
+/**
+ * 跳转博客详情页
+ */
+const onBlogDetail = () => {
+    router.push(`/blog/${props.blog._id}`);
+}
 
 </script>
 
@@ -55,7 +65,7 @@ const props = defineProps<IProps>();
             font-size: 28px;
             font-weight: 700;
             transition: all 0.5s;
-
+            cursor: pointer;
             &:hover {
                 color: #444;
             }

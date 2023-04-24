@@ -8,13 +8,27 @@ const router = createRouter({
 		{
 			path: '/',
 			name: '文章',
+			meta: {
+				isLayout: true
+			},
 			component: () => import('@/views/home/index.vue')
 		},
 		{
 			path: '/about',
 			name: '关于',
+			meta: {
+				isLayout: true
+			},
 			component: () => import('@/views/about/index.vue')
 		},
+		{
+			path: '/blog/:blogId',
+			name: '博客',
+			meta: {
+				isLayout: false
+			},
+			component: () => import('@/views/blog/index.vue')
+		}
 	]
 });
 

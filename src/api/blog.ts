@@ -17,6 +17,18 @@ export function BlogPageQuery(data: IBlogPage) {
 }
 
 /**
+ * 根据博客ID查询博客内容
+ * @param blogId 
+ * @returns 
+ */
+export function BlogFindById(blogId: string) {
+    return Request.request({
+        url: `/blog/detail/${blogId}`,
+        method: 'GET',
+    });
+}
+
+/**
  * 博客 分页查询请求参数
  */
 export interface IBlogPage extends CommonTypes.PageQueryParams {

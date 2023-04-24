@@ -15,7 +15,7 @@
             </div>
             <div class="navbar-container">
                 <div :class="{ 'navbar-item': true, 'navbar-activity': router.currentRoute.value.path === routerItem.path }"
-                    v-for="routerItem in router.options.routes">
+                    v-for="routerItem in routerList">
                     <RouterLink :to="routerItem.path">{{ routerItem.name }}</RouterLink>
                 </div>
             </div>
@@ -24,15 +24,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { onMounted, ref, type Ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 
 const router = useRouter();
 
+interface RouterItem {
+    path: string;
+    name: string;
+    isLayout: boolean;
+}
+
 /**
- * 路由下标
+ * 路由列表
  */
-const navbarIndex: Ref<number> = ref(0);
+const routerList: Ref<RouterItem[]> = ref([]);
+
+onMounted(() => {
+    router.options.routes.forEach(item => {
+        if (item.meta?.isLayout) {
+            routerList.value.push({
+                path: item.path,
+                name: item.name as string,
+                isLayout: item.meta.isLayout as boolean
+            })
+        }
+    });
+});
+
 </script>
 
 <style lang="less" scoped>
@@ -106,7 +125,7 @@ const navbarIndex: Ref<number> = ref(0);
                     border-right: none;
                 }
             }
-            
+
             .navbar-activity {
                 background: #F6F6F6;
             }
