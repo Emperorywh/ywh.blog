@@ -23,6 +23,7 @@
             摘要：{{ blogInfo?.abstract }}
         </div>
         <div id="vditor" ref="vditorRef"></div>
+        <el-divider />
         <div class="prev-next-blog">
             <div class="prev-next-row">
                 <div class="preffix">
@@ -41,6 +42,13 @@
                 </div>
             </div>
         </div>
+        
+        <div class="comment-box">
+            <div class="comment-header">
+                已经看到这里了，不留下点什么？
+            </div>
+            <CommentForm :blogId="pageBlogId" :onSuccess="createCommentSuccess"></CommentForm>
+        </div>
     </div>
 </template>
 
@@ -52,16 +60,26 @@ import { onMounted, reactive, ref, watch, type Ref } from "vue";
 import { useRouter } from "vue-router";
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
+import CommentForm from "@/components/CommentForm/index.vue";
+import { CommentListByBlogId } from "@/api/comment";
 
 onMounted(() => {
     onFetchBlogInfo();
+    onFetchCommentByBlog();
 });
 
 const router = useRouter();
 
 watch(() => router.currentRoute.value.path, () => {
     onFetchBlogInfo();
+    onFetchCommentByBlog();
 });
+
+
+/**
+ * 当前页面的博客ID
+ */
+const pageBlogId: Ref<string> = ref(router.currentRoute.value.params.blogId as string);
 
 interface BlogPrevNext {
     prevBlog: IBlog | null,
@@ -125,6 +143,33 @@ const onBlogDetail = (blogId?: string) => {
     }
 }
 
+/**
+ * 评论列表
+ */
+const commentList: Ref<IComment[]> = ref([]);
+
+/**
+ * 成功创建评论
+ */
+const createCommentSuccess = () => {
+    onFetchCommentByBlog();
+}
+
+/**
+ * 根据博客ID查询博客评论
+ */
+const onFetchCommentByBlog = async () => {
+    const response = await CommentListByBlogId(pageBlogId.value);
+    if (response.code === 200) {
+        commentList.value = response.data;
+    } else {
+        ElNotification({
+            title: 'Error',
+            message: response.message || "查询评论失败",
+            type: 'error',
+        });
+    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -209,6 +254,10 @@ const onBlogDetail = (blogId?: string) => {
                 }
             }
         }
+    }
+
+    .comment-box {
+        font-size: 24px;
     }
 }
 </style>

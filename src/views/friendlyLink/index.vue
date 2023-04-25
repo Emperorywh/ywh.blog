@@ -239,6 +239,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         padding: 40px 30px 0 30px;
         border: 1px solid #EEE;
         border-radius: 10px;
+        background-color: #FFF;
     }
 }
 </style>
