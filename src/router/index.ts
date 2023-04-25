@@ -14,6 +14,22 @@ const router = createRouter({
 			component: () => import('@/views/home/index.vue')
 		},
 		{
+			path: '/friendlyLink',
+			name: '友情链接',
+			meta: {
+				isLayout: true
+			},
+			component: () => import('@/views/friendlyLink/index.vue')
+		},
+		{
+			path: '/message',
+			name: '留言',
+			meta: {
+				isLayout: true
+			},
+			component: () => import('@/views/message/index.vue')
+		},
+		{
 			path: '/about',
 			name: '关于',
 			meta: {

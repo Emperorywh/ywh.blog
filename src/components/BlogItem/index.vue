@@ -1,9 +1,9 @@
 <template>
-    <div class="blog-item-container" @click="onBlogDetail">
-        <div class="blog-title">
+    <div class="blog-item-container">
+        <div class="blog-title" @click="onBlogDetail">
             <a>{{ props.blog.title }}</a>
         </div>
-        <el-image v-if="props.blog.cover" class="blog-cover" :src="props.blog.cover" fit="cover" />
+        <el-image v-if="props.blog.cover" class="blog-cover" :preview-src-list="[props.blog.cover]" :src="props.blog.cover" />
         <div class="blog-info">
             <div class="blog-time">
                 时间：{{ new Date(props.blog.updateAt).toLocaleString() }}
@@ -42,6 +42,11 @@ const props = defineProps<IProps>();
  * 跳转博客详情页
  */
 const onBlogDetail = () => {
+    window.scrollTo({
+        left: 0,
+        top: 0,
+        behavior: 'smooth'
+    });
     router.push(`/blog/${props.blog._id}`);
 }
 
@@ -66,6 +71,7 @@ const onBlogDetail = () => {
             font-weight: 700;
             transition: all 0.5s;
             cursor: pointer;
+
             &:hover {
                 color: #444;
             }
@@ -74,9 +80,9 @@ const onBlogDetail = () => {
 
     .blog-cover {
         border-radius: 10px;
-        width: auto;
         max-height: 300px;
         margin: 10px 0;
+        object-fit: contain;
     }
 
     .blog-info {

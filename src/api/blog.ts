@@ -17,7 +17,7 @@ export function BlogPageQuery(data: IBlogPage) {
 }
 
 /**
- * 根据博客ID查询博客内容
+ * 根据博客ID查询博客
  * @param blogId 
  * @returns 
  */
@@ -25,6 +25,18 @@ export function BlogFindById(blogId: string) {
     return Request.request({
         url: `/blog/detail/${blogId}`,
         method: 'GET',
+    });
+}
+
+/**
+ * 根据博客ID查询 上一篇和下一篇博客
+ * @param blogId 
+ * @returns 
+ */
+export function BlogPrevNextBlogById(blogId: string) {
+    return Request.request({
+        url: `/blog/prevNextBlog/${blogId}`,
+        method: 'GET'
     });
 }
 

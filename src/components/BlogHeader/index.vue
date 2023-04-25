@@ -124,6 +124,10 @@ onMounted(() => {
                 &:not(:last-child) {
                     border-right: none;
                 }
+
+                &:hover {
+                    font-weight: 700;
+                }
             }
 
             .navbar-activity {
