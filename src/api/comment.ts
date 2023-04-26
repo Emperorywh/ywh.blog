@@ -34,11 +34,12 @@ export function CommentListByBlogId(blogId: string) {
 export interface IComment {
     _id?: string;
     blogId?: string;
-    parent?: string;
+    parent?: IComment | string;
     from: string;
-    to?: string;
+    to?: IComment | string;
     email: string;
     content: string;
     avatarUrl?: string;
     createAt?: number;
+    showCommentForm?: boolean;
 }

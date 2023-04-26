@@ -49,6 +49,9 @@
             </div>
             <CommentForm :blogId="pageBlogId" :onSuccess="createCommentSuccess"></CommentForm>
         </div>
+        <div>
+            <CommentList :blogId="pageBlogId"></CommentList>
+        </div>
     </div>
 </template>
 
@@ -61,18 +64,16 @@ import { useRouter } from "vue-router";
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
 import CommentForm from "@/components/CommentForm/index.vue";
-import { CommentListByBlogId } from "@/api/comment";
+import CommentList from "@/components/CommentList/index.vue";
 
 onMounted(() => {
     onFetchBlogInfo();
-    onFetchCommentByBlog();
 });
 
 const router = useRouter();
 
 watch(() => router.currentRoute.value.path, () => {
     onFetchBlogInfo();
-    onFetchCommentByBlog();
 });
 
 
@@ -143,33 +144,15 @@ const onBlogDetail = (blogId?: string) => {
     }
 }
 
-/**
- * 评论列表
- */
-const commentList: Ref<IComment[]> = ref([]);
 
 /**
  * 成功创建评论
  */
 const createCommentSuccess = () => {
-    onFetchCommentByBlog();
+
 }
 
-/**
- * 根据博客ID查询博客评论
- */
-const onFetchCommentByBlog = async () => {
-    const response = await CommentListByBlogId(pageBlogId.value);
-    if (response.code === 200) {
-        commentList.value = response.data;
-    } else {
-        ElNotification({
-            title: 'Error',
-            message: response.message || "查询评论失败",
-            type: 'error',
-        });
-    }
-}
+
 </script>
 
 <style lang="less" scoped>

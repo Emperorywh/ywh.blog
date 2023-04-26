@@ -1,33 +1,34 @@
 <template>
     <div class="comment-container">
         <div class="comment-info">
-            <input v-model="comment.from" type="text" placeholder="昵称">
-            <input v-model="comment.email" type="text" placeholder="邮箱">
+            <input v-model="comment.from" type="text" placeholder="昵称" autocomplete="off">
+            <input v-model="comment.email" type="text" placeholder="邮箱" autocomplete="off">
         </div>
-        <textarea v-model="comment.content" placeholder="键入内容"></textarea>
+        <textarea v-model="comment.content" placeholder="键入内容" autocomplete="off"></textarea>
         <div class="comment-bottom">
+            <div v-if="props.to" class="comment-replay-box">
+                <span class="comment-replay">回复</span>
+                <span class="comment-replay-name">@{{ props.to.from }}</span>
+                <span class="iconfont icon-times comment-replay-close" @click="onCloseReplay"></span>
+            </div>
             <el-button type="danger" @click="onCreateComment">发送评论</el-button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { CommentCreate } from '@/api/comment';
+import { CommentCreate, type IComment } from '@/api/comment';
 import { ElNotification } from 'element-plus';
 import { reactive } from 'vue';
 
 interface IProps {
+    to?: IComment;
     blogId: string;
     onSuccess: () => void;
+    onClose?: (comment: IComment) => void;
 }
 
 const props = defineProps<IProps>();
-
-interface IComment {
-    from: string;
-    email: string;
-    content: string;
-}
 
 /**
  * 评论内容
@@ -64,12 +65,17 @@ const onCreateComment = async () => {
         });
         return;
     }
-    const response = await CommentCreate({
+    const jsonData: IComment = {
         blogId: props.blogId,
         from: comment.from,
         email: comment.email,
-        content: comment.content
-    });
+        content: comment.content,
+    }
+    if (props.to) {
+        jsonData.parent = props.blogId;
+        jsonData.to = props.to._id;
+    }
+    const response = await CommentCreate(jsonData);
     if (response.code === 200) {
         ElNotification({
             title: '成功',
@@ -84,6 +90,15 @@ const onCreateComment = async () => {
             message: response.message || "评论失败",
             type: 'error',
         });
+    }
+}
+
+/**
+ * 关闭评论窗口
+ */
+const onCloseReplay = () => {
+    if (props.onClose && props.to) {
+        props.onClose(props.to);
     }
 }
 
@@ -126,6 +141,30 @@ const onCreateComment = async () => {
     .comment-bottom {
         display: flex;
         justify-content: flex-end;
+        align-items: center;
+
+        .comment-replay-box {
+            margin-right: 10px;
+
+            .comment-replay {
+                margin-right: 5px;
+            }
+
+            .comment-replay-name {
+                color: #999;
+                margin-right: 10px;
+            }
+
+            .comment-replay-close {
+                color: #999;
+                font-size: 12px;
+                cursor: pointer;
+
+                &:hover {
+                    color: #2a2e2e;
+                }
+            }
+        }
     }
 }
 </style>
