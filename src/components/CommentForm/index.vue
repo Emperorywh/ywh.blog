@@ -22,6 +22,7 @@ import { ElNotification } from 'element-plus';
 import { reactive } from 'vue';
 
 interface IProps {
+    parentId?: string;
     to?: IComment;
     blogId: string;
     onSuccess: () => void;
@@ -72,8 +73,10 @@ const onCreateComment = async () => {
         content: comment.content,
     }
     if (props.to) {
-        jsonData.parent = props.blogId;
         jsonData.to = props.to._id;
+    }
+    if (props.parentId) {
+        jsonData.parent = props.parentId;
     }
     const response = await CommentCreate(jsonData);
     if (response.code === 200) {

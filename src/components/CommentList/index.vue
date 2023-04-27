@@ -15,7 +15,7 @@
                     <div class="comment-content">
                         {{ commentItem.content }}
                     </div>
-                    <div class="comment-btns">
+                    <div class="comment-btns" v-if="false">
                         <div class="comment-replay" @click="onReplay(commentItem)">
                             回复
                         </div>
@@ -33,6 +33,7 @@ import { onMounted, ref, watch, type Ref } from 'vue';
 import { CommentListByBlogId, type IComment } from "@/api/comment";
 import { ElNotification } from 'element-plus';
 import CommentForm from "@/components/CommentForm/index.vue";
+import ArrayToTree from "@/utils/ArrayToTree";
 
 onMounted(() => {
     onFetchCommentByBlog();
@@ -62,6 +63,8 @@ const onFetchCommentByBlog = async () => {
         response.data.forEach((item: IComment) => {
             item.showCommentForm = false;
         });
+        console.log('元素', response.data);
+        console.log('树形', ArrayToTree(response.data));
         commentList.value = response.data;
     } else {
         ElNotification({
