@@ -42,4 +42,5 @@ export interface IComment {
     avatarUrl?: string;
     createAt?: number;
     showCommentForm?: boolean;
+    children?: IComment[]
 }

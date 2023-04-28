@@ -2,26 +2,61 @@
     <div class="comment-list-container">
         <div class="comment-list-box">
             <div class="comment-list-item" v-for="commentItem in commentList" :key="commentItem._id">
-                <el-avatar class="comment-cover" :size="50" :src="commentItem.avatarUrl" />
-                <div class="comment-item-info">
-                    <div class="comment-item-top">
-                        <div class="comment-from">
-                            {{ commentItem.from }}
+                <div class="comment-card">
+                    <el-avatar class="comment-cover" :size="50" :src="commentItem.avatarUrl" />
+                    <div class="comment-item-info">
+                        <div class="comment-item-top">
+                            <div class="comment-from">
+                                {{ commentItem.from }}
+                            </div>
+                            <div class="comment-date">
+                                {{ new Date(commentItem.createAt!).toLocaleString() }}
+                            </div>
                         </div>
-                        <div class="comment-date">
-                            {{ new Date(commentItem.createAt!).toLocaleString() }}
+                        <div class="comment-content">
+                            {{ commentItem.content }}
+                        </div>
+                        <div class="comment-btns">
+                            <div class="comment-replay" @click="onReplay(commentItem)">
+                                回复
+                            </div>
+                        </div>
+                        <CommentForm :parentId="commentItem._id" v-if="commentItem.showCommentForm" :to="commentItem"
+                            :blogId="props.blogId" @on-success="onFetchCommentByBlog" @on-cancel="onCloseReplay">
+                        </CommentForm>
+                    </div>
+                </div>
+                <div class="comment-list-item comment-list-children" v-for="commentChildren in commentItem.children" :key="commentChildren._id">
+                    <div class="comment-card">
+                        <el-avatar class="comment-cover" :size="30" :src="commentChildren.avatarUrl" />
+                        <div class="comment-item-info">
+                            <div class="comment-item-top">
+                                <div class="comment-from child-form-box">
+                                    <div class="child-from">
+                                        {{ commentChildren.from }}
+                                    </div>
+                                    <div class="child-form-icon">@</div>
+                                    <div class="child-to">
+                                        {{ typeof commentChildren.to !== 'string' &&  commentChildren.to?.from }}
+                                    </div>
+                                </div>
+                                <div class="comment-date">
+                                    {{ new Date(commentChildren.createAt!).toLocaleString() }}
+                                </div>
+                            </div>
+                            <div class="comment-content">
+                                {{ commentChildren.content }}
+                            </div>
+                            <div class="comment-btns">
+                                <div class="comment-replay" @click="onChildrenReplay(commentItem, commentChildren)">
+                                    回复
+                                </div>
+                            </div>
+                            <CommentForm :parentId="commentItem._id" v-if="commentChildren.showCommentForm" :to="commentChildren"
+                                :blogId="props.blogId" @on-success="onFetchCommentByBlog" @on-cancel="onCloseReplay">
+                            </CommentForm>
                         </div>
                     </div>
-                    <div class="comment-content">
-                        {{ commentItem.content }}
-                    </div>
-                    <div class="comment-btns" v-if="false">
-                        <div class="comment-replay" @click="onReplay(commentItem)">
-                            回复
-                        </div>
-                    </div>
-                    <CommentForm v-if="commentItem.showCommentForm" :to="commentItem" :blogId="props.blogId"
-                        :onSuccess="onFetchCommentByBlog" :onClose="() => onCloseReplay(commentItem)"></CommentForm>
                 </div>
             </div>
         </div>
@@ -47,6 +82,7 @@ interface IProps {
     blogId: string;
 }
 
+
 const props = defineProps<IProps>();
 
 /**
@@ -62,10 +98,14 @@ const onFetchCommentByBlog = async () => {
     if (response.code === 200) {
         response.data.forEach((item: IComment) => {
             item.showCommentForm = false;
+            if(item.children && item.children.length > 0) {
+                item.children.forEach(cItem => {
+                    cItem.showCommentForm = false;
+                });
+            }
         });
-        console.log('元素', response.data);
-        console.log('树形', ArrayToTree(response.data));
-        commentList.value = response.data;
+        console.log('树形', ArrayToTree(response.data))
+        commentList.value = ArrayToTree(response.data);
     } else {
         ElNotification({
             title: 'Error',
@@ -74,6 +114,7 @@ const onFetchCommentByBlog = async () => {
         });
     }
 }
+
 
 /**
  * 回复评论
@@ -89,19 +130,44 @@ const onReplay = (commentItem: IComment) => {
 }
 
 /**
+ * 子级回复子级
+ * @param commentItem 
+ * @param commentChildren 
+ */
+const onChildrenReplay = (commentItem: IComment, commentChildren: IComment) => {
+    commentChildren.showCommentForm = !commentChildren.showCommentForm;
+    commentList.value.forEach(item => {
+        item.showCommentForm = false;
+        if (item.children && item.children.length > 0) {
+            item.children.forEach(cItem => {
+                if (cItem._id !== commentChildren._id) {
+                    cItem.showCommentForm = false;
+                }
+            });
+        }
+    });
+}
+
+/**
  * 关闭当前回复
  */
 const onCloseReplay = (commentItem: IComment) => {
     commentItem.showCommentForm = !commentItem.showCommentForm;
 }
+
+defineExpose({
+    onFetchCommentByBlog
+})
+
 </script>
 
 <style lang="less" scoped>
 .comment-list-box {
     .comment-list-item {
-        display: flex;
         margin-bottom: 20px;
-
+        .comment-card {
+            display: flex;
+        }
         .comment-cover {
             flex: 0 1 auto;
             margin-right: 20px;
@@ -127,6 +193,27 @@ const onCloseReplay = (commentItem: IComment) => {
                     }
                 }
 
+                .child-form-box {
+                    display: flex;
+                    align-items: center;
+
+                    &:hover {
+                        transform: scale(1);
+                    }
+
+                    .child-from {
+                        margin-right: 10px;
+                    }
+
+                    .child-form-icon {
+                        color: #999;
+                    }
+
+                    .child-to {
+                        color: #999;
+                    }
+                }
+
                 .comment-date {
                     font-size: 12px;
                 }
@@ -149,4 +236,9 @@ const onCloseReplay = (commentItem: IComment) => {
             }
         }
     }
-}</style>
+
+    .comment-list-children {
+        margin: 10px 0 10px 70px;
+    }
+}
+</style>

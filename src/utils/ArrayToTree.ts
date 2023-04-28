@@ -10,11 +10,9 @@ const ArrayToTree = (items: any[], id = '_id', parentId = 'parent', children = '
     items.forEach(item => {
         itemMap[item[id]] = { ...item, [children]: [] };
     });
-    console.log('itemMap', itemMap);
     // 遍历数组，将元素添加到它们对应的父元素的 children 数组中
     items.forEach(item => {
         const parentItem = itemMap[item[parentId]];
-        console.log(parentId, item[parentId], itemMap[item[parentId]]);
         if (parentItem) {
             parentItem[children].push(itemMap[item[id]]);
         } else {

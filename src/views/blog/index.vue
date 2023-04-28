@@ -42,16 +42,17 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="comment-box">
             <div class="comment-header">
                 已经看到这里了，不留下点什么？
             </div>
-            <CommentForm :blogId="pageBlogId" :onSuccess="createCommentSuccess"></CommentForm>
+            <CommentForm :blogId="pageBlogId" @on-success="createCommentSuccess"></CommentForm>
         </div>
         <div>
-            <CommentList :blogId="pageBlogId"></CommentList>
+            <CommentList :blogId="pageBlogId" ref="commentListRef"></CommentList>
         </div>
+
     </div>
 </template>
 
@@ -59,7 +60,7 @@
 import type { IBlog } from "@/api/blog";
 import { BlogFindById } from "@/api/blog";
 import { ElNotification } from "element-plus";
-import { onMounted, reactive, ref, watch, type Ref } from "vue";
+import { onMounted, reactive, ref, watch, type Ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import Vditor from 'vditor';
 import 'vditor/dist/index.css';
@@ -75,6 +76,11 @@ const router = useRouter();
 watch(() => router.currentRoute.value.path, () => {
     onFetchBlogInfo();
 });
+
+/**
+ * 评论列表ref
+ */
+const commentListRef: Ref<any> = ref(null);
 
 
 /**
@@ -149,7 +155,7 @@ const onBlogDetail = (blogId?: string) => {
  * 成功创建评论
  */
 const createCommentSuccess = () => {
-
+    commentListRef.value.onFetchCommentByBlog();
 }
 
 

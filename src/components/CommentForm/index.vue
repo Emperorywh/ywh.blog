@@ -19,17 +19,26 @@
 <script setup lang="ts">
 import { CommentCreate, type IComment } from '@/api/comment';
 import { ElNotification } from 'element-plus';
-import { reactive } from 'vue';
+import { reactive, onMounted } from 'vue';
+const emit = defineEmits<{
+    (e: 'on-success'): void;
+    (e: 'on-cancel', comment: IComment): void;
+}>();
+
+onMounted(() => {
+    initCommonForm();
+});
 
 interface IProps {
     parentId?: string;
     to?: IComment;
     blogId: string;
-    onSuccess: () => void;
-    onClose?: (comment: IComment) => void;
 }
 
+
 const props = defineProps<IProps>();
+console.log("parentId", props.parentId);
+console.log("to", props.to);
 
 /**
  * 评论内容
@@ -79,6 +88,11 @@ const onCreateComment = async () => {
         jsonData.parent = props.parentId;
     }
     const response = await CommentCreate(jsonData);
+    const commentFormStorage = {
+        from: comment.from,
+        email: comment.email
+    }
+    localStorage.setItem('CommentFormStorage', JSON.stringify(commentFormStorage));
     if (response.code === 200) {
         ElNotification({
             title: '成功',
@@ -86,7 +100,9 @@ const onCreateComment = async () => {
             type: 'success',
         });
         comment.content = '';
-        props.onSuccess();
+        console.log('1子组件评论成功');
+        emit('on-success');
+        console.log('2子组件评论成功');
     } else {
         ElNotification({
             title: 'Error',
@@ -100,8 +116,19 @@ const onCreateComment = async () => {
  * 关闭评论窗口
  */
 const onCloseReplay = () => {
-    if (props.onClose && props.to) {
-        props.onClose(props.to);
+    if (props.to) {
+        emit('on-cancel', props.to);
+    }
+}
+
+/**
+ * 初始化评论form表单
+ */
+const initCommonForm = () => {
+    const tempForm: IComment = JSON.parse(localStorage.getItem("CommentFormStorage") || "null");
+    if (tempForm) {
+        comment.from = tempForm.from;
+        comment.email = tempForm.email;
     }
 }
 
