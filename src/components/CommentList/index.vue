@@ -3,7 +3,9 @@
         <div class="comment-list-box">
             <div class="comment-list-item" v-for="commentItem in commentList" :key="commentItem._id">
                 <div class="comment-card">
-                    <el-avatar class="comment-cover" :size="50" :src="commentItem.avatarUrl" />
+                    <el-avatar class="comment-cover" :size="50" :src="commentItem.avatarUrl">
+                        <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+                    </el-avatar>
                     <div class="comment-item-info">
                         <div class="comment-item-top">
                             <div class="comment-from">
@@ -26,9 +28,12 @@
                         </CommentForm>
                     </div>
                 </div>
-                <div class="comment-list-item comment-list-children" v-for="commentChildren in commentItem.children" :key="commentChildren._id">
+                <div class="comment-list-item comment-list-children" v-for="commentChildren in commentItem.children"
+                    :key="commentChildren._id">
                     <div class="comment-card">
-                        <el-avatar class="comment-cover" :size="30" :src="commentChildren.avatarUrl" />
+                        <el-avatar class="comment-cover" :size="30" :src="commentChildren.avatarUrl">
+                            <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+                        </el-avatar>
                         <div class="comment-item-info">
                             <div class="comment-item-top">
                                 <div class="comment-from child-form-box">
@@ -37,7 +42,7 @@
                                     </div>
                                     <div class="child-form-icon">@</div>
                                     <div class="child-to">
-                                        {{ typeof commentChildren.to !== 'string' &&  commentChildren.to?.from }}
+                                        {{ typeof commentChildren.to !== 'string' && commentChildren.to?.from }}
                                     </div>
                                 </div>
                                 <div class="comment-date">
@@ -52,8 +57,9 @@
                                     回复
                                 </div>
                             </div>
-                            <CommentForm :parentId="commentItem._id" v-if="commentChildren.showCommentForm" :to="commentChildren"
-                                :blogId="props.blogId" @on-success="onFetchCommentByBlog" @on-cancel="onCloseReplay">
+                            <CommentForm :parentId="commentItem._id" v-if="commentChildren.showCommentForm"
+                                :to="commentChildren" :blogId="props.blogId" @on-success="onFetchCommentByBlog"
+                                @on-cancel="onCloseReplay">
                             </CommentForm>
                         </div>
                     </div>
@@ -98,7 +104,7 @@ const onFetchCommentByBlog = async () => {
     if (response.code === 200) {
         response.data.forEach((item: IComment) => {
             item.showCommentForm = false;
-            if(item.children && item.children.length > 0) {
+            if (item.children && item.children.length > 0) {
                 item.children.forEach(cItem => {
                     cItem.showCommentForm = false;
                 });
@@ -165,9 +171,11 @@ defineExpose({
 .comment-list-box {
     .comment-list-item {
         margin-bottom: 20px;
+
         .comment-card {
             display: flex;
         }
+
         .comment-cover {
             flex: 0 1 auto;
             margin-right: 20px;
