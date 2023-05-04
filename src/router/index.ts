@@ -31,7 +31,7 @@ const router = createRouter({
 		},
 		{
 			path: '/about',
-			name: '关于',
+			name: '关于我',
 			meta: {
 				isLayout: true
 			},

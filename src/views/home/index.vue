@@ -19,6 +19,7 @@
                     }}</el-checkbox>
             </el-checkbox-group>
         </div>
+        <el-alert v-if="blogSearch.blogSearchText.length > 0" :title="'搜索关键字：' + blogSearch.blogSearchText" type="success" center show-icon />
         <div class="blog-list">
             <BlogItem v-for="blogItem in blogResult.blogList" :blog="blogItem" :key="blogItem._id"></BlogItem>
         </div>
@@ -36,6 +37,9 @@ import { ElNotification } from "element-plus";
 import BlogItem from "@/components/BlogItem/index.vue";
 import { BlogClassifyPageQuery, type IClassifycation } from "@/api/classification";
 import { BlogLabelPageQuery, type ILabel } from "@/api/label";
+import { useBlogSearchStore } from "@/stores/blogSearch";
+
+const blogSearch = useBlogSearchStore();
 
 onMounted(() => {
     onFetchBlogList();
@@ -157,7 +161,7 @@ const pageData: IBlogPage = reactive({
 /**
  * 监听页码变化
  */
-watch([pageData, blogClassify, blogLabelSelected], () => {
+watch([pageData, blogClassify, blogLabelSelected, blogSearch], () => {
     onFetchBlogList();
 });
 
@@ -169,7 +173,8 @@ const onFetchBlogList = async () => {
         pageIndex: pageData.pageIndex,
         pageSize: pageData.pageSize,
         classification: blogClassify.value,
-        label: blogLabelSelected.value
+        label: blogLabelSelected.value,
+        title: blogSearch.blogSearchText
     });
     if (response.code === 200) {
         blogResult.blogList = response.data.items;

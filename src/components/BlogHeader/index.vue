@@ -6,8 +6,8 @@
                     <RouterLink to="/">Emperor</RouterLink>
                 </div>
                 <div class="header-search">
-                    <input type="text" placeholder="搜索关键字" />
-                    <span class="iconfont icon-sousuo"></span>
+                    <input ref="inputSearchRef" type="text" placeholder="搜索关键字" @keydown.enter="onSearch"/>
+                    <span class="iconfont icon-sousuo" @click="onSearch"></span>
                 </div>
             </div>
             <div class="personal-signature">
@@ -24,9 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
+import { useBlogSearchStore } from "@/stores/blogSearch";
 
+const blogSearch = useBlogSearchStore();
+const inputSearchRef = ref();
 const router = useRouter();
 
 interface RouterItem {
@@ -50,6 +53,20 @@ onMounted(() => {
             })
         }
     });
+});
+
+/**
+ * 点击搜索图标
+ */
+const onSearch = () => {
+    if(inputSearchRef.value) {
+        blogSearch.blogSearchText = inputSearchRef.value.value;
+    }
+}
+
+watch([router.currentRoute], () => {
+    inputSearchRef.value.value = "";
+    blogSearch.blogSearchText = "";
 });
 
 </script>
