@@ -23,8 +23,9 @@
                                 回复
                             </div>
                         </div>
-                        <CommentForm :parentId="commentItem._id" v-if="commentItem.showCommentForm" :to="commentItem"
-                            :blogId="props.blogId" @on-success="onFetchCommentByBlog" @on-cancel="onCloseReplay">
+                        <CommentForm :comment-type="props.commentType" :parentId="commentItem._id" v-if="commentItem.showCommentForm"
+                            :to="commentItem" :blogId="props.blogId" @on-success="onFetchCommentList"
+                            @on-cancel="onCloseReplay">
                         </CommentForm>
                     </div>
                 </div>
@@ -57,9 +58,9 @@
                                     回复
                                 </div>
                             </div>
-                            <CommentForm :parentId="commentItem._id" v-if="commentChildren.showCommentForm"
-                                :to="commentChildren" :blogId="props.blogId" @on-success="onFetchCommentByBlog"
-                                @on-cancel="onCloseReplay">
+                            <CommentForm :comment-type="props.commentType" :parentId="commentItem._id"
+                                v-if="commentChildren.showCommentForm" :to="commentChildren" :blogId="props.blogId"
+                                @on-success="onFetchCommentList" @on-cancel="onCloseReplay">
                             </CommentForm>
                         </div>
                     </div>
@@ -71,21 +72,22 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue';
-import { CommentListByBlogId, type IComment } from "@/api/comment";
+import { CommentListByAboutMessage, CommentListByBlogId, CommentListByMessage, type IComment } from "@/api/comment";
 import { ElNotification } from 'element-plus';
 import CommentForm from "@/components/CommentForm/index.vue";
 import ArrayToTree from "@/utils/ArrayToTree";
 
 onMounted(() => {
-    onFetchCommentByBlog();
+    onFetchCommentList();
 });
 
 watch(() => props.blogId, () => {
-    onFetchCommentByBlog();
+    onFetchCommentList();
 })
 
 interface IProps {
-    blogId: string;
+    blogId?: string;
+    commentType: number
 }
 
 
@@ -97,11 +99,18 @@ const props = defineProps<IProps>();
 const commentList: Ref<IComment[]> = ref([]);
 
 /**
- * 根据博客ID查询博客评论
+ * 获取评论列表
  */
-const onFetchCommentByBlog = async () => {
-    const response = await CommentListByBlogId(props.blogId);
-    if (response.code === 200) {
+const onFetchCommentList = async () => {
+    let response;
+    if (props.blogId && props.commentType === 0) {
+        response = await CommentListByBlogId(props.blogId);
+    } else if (props.commentType === 1) {
+        response = await CommentListByMessage();
+    } else if (props.commentType === 2) {
+        response = await CommentListByAboutMessage();
+    }
+    if (response && response.code === 200) {
         response.data.forEach((item: IComment) => {
             item.showCommentForm = false;
             if (item.children && item.children.length > 0) {
@@ -110,9 +119,8 @@ const onFetchCommentByBlog = async () => {
                 });
             }
         });
-        console.log('树形', ArrayToTree(response.data))
         commentList.value = ArrayToTree(response.data);
-    } else {
+    } else if (response) {
         ElNotification({
             title: 'Error',
             message: response.message || "查询评论失败",
@@ -162,7 +170,7 @@ const onCloseReplay = (commentItem: IComment) => {
 }
 
 defineExpose({
-    onFetchCommentByBlog
+    onFetchCommentList
 })
 
 </script>

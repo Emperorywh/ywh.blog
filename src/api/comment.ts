@@ -29,6 +29,31 @@ export function CommentListByBlogId(blogId: string) {
 }
 
 /**
+ * 留言板列表
+ * @param data 
+ * @returns 
+ */
+export function CommentListByMessage() {
+    return Request.request({
+        url: '/comment/message',
+        method: 'POST'
+    });
+}
+
+
+/**
+ * 关于我留言板列表
+ * @param data 
+ * @returns 
+ */
+export function CommentListByAboutMessage() {
+    return Request.request({
+        url: '/comment/aboutMessage',
+        method: 'POST'
+    });
+}
+
+/**
  * 评论实体类
  */
 export interface IComment {
@@ -42,5 +67,6 @@ export interface IComment {
     avatarUrl?: string;
     createAt?: number;
     showCommentForm?: boolean;
-    children?: IComment[]
+    children?: IComment[];
+    commentType: number;
 }

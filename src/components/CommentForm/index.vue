@@ -32,13 +32,12 @@ onMounted(() => {
 interface IProps {
     parentId?: string;
     to?: IComment;
-    blogId: string;
+    blogId?: string;
+    commentType: number
 }
 
 
 const props = defineProps<IProps>();
-console.log("parentId", props.parentId);
-console.log("to", props.to);
 
 /**
  * 评论内容
@@ -46,7 +45,8 @@ console.log("to", props.to);
 const comment: IComment = reactive({
     from: '',
     email: '',
-    content: ''
+    content: '',
+    commentType: props.commentType
 });
 
 /**
@@ -80,6 +80,7 @@ const onCreateComment = async () => {
         from: comment.from,
         email: comment.email,
         content: comment.content,
+        commentType: props.commentType
     }
     if (props.to) {
         jsonData.to = props.to._id;
@@ -100,9 +101,7 @@ const onCreateComment = async () => {
             type: 'success',
         });
         comment.content = '';
-        console.log('1子组件评论成功');
         emit('on-success');
-        console.log('2子组件评论成功');
     } else {
         ElNotification({
             title: 'Error',
