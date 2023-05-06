@@ -197,6 +197,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             .friendly-link-info {
                 display: flex;
                 align-items: center;
+                margin-bottom: 10px;
 
                 .friendly-link-url {
                     transition: all 0.5s;
