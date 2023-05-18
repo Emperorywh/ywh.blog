@@ -25,14 +25,17 @@
             <div class="blog-list-item-box" v-if="blogResult.blogList.length > 0">
                 <BlogItem v-for="blogItem in blogResult.blogList" :blog="blogItem" :key="blogItem._id"></BlogItem>
             </div>
-            <el-skeleton v-else animated style="margin-top: 50px;">
-                <template #template>
-                    <el-skeleton-item variant="h1" style="height: 40px" />
-                    <el-skeleton-item variant="image" style="width: 100%; height: 300px" />
-                    <el-skeleton-item variant="h3" style="margin: 10px 0;" />
-                    <el-skeleton-item variant="h2" style="height: 25px" />
-                </template>
-            </el-skeleton>
+            <div v-else>
+                <el-skeleton v-if="loading" animated style="margin-top: 50px;">
+                    <template #template>
+                        <el-skeleton-item variant="h1" style="height: 40px" />
+                        <el-skeleton-item variant="image" style="width: 100%; height: 300px" />
+                        <el-skeleton-item variant="h3" style="margin: 10px 0;" />
+                        <el-skeleton-item variant="h2" style="height: 25px" />
+                    </template>
+                </el-skeleton>
+                <el-empty v-if="blogResult.blogList.length === 0 && !loading" description="暂无文章" />
+            </div>
         </div>
         <div class="blog-page-box">
             <el-pagination layout="prev, pager, next" :total="blogResult.total" :page-size="pageData.pageSize"
@@ -62,6 +65,11 @@ interface BlogResult {
     blogList: Array<IBlog>;
     total: number;
 }
+
+/**
+ * 是否加载中
+ */
+const loading: Ref<boolean> = ref(true);
 
 /**
  * 当前选中的博客分类
@@ -180,6 +188,7 @@ watch([pageData, blogClassify, blogLabelSelected, blogSearch], () => {
  * 分页查询博客列表
  */
 const onFetchBlogList = async () => {
+    loading.value = true;
     const response = await BlogPageQuery({
         pageIndex: pageData.pageIndex,
         pageSize: pageData.pageSize,
@@ -190,6 +199,7 @@ const onFetchBlogList = async () => {
     if (response.code === 200) {
         blogResult.blogList = response.data.items;
         blogResult.total = response.data.total;
+        loading.value = false;
     } else {
         ElNotification({
             title: 'Error',
