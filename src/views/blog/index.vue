@@ -1,9 +1,10 @@
 <template>
     <div class="blog-container">
-        <div class="blog-title">
+        <el-skeleton v-if="loading" style="margin-top: 10px;" animated />
+        <div class="blog-title" v-if="!loading">
             {{ blogInfo?.title }}
         </div>
-        <div class="blog-info">
+        <div class="blog-info" v-if="!loading">
             <div class="blog-time">
                 时间：{{ new Date(blogInfo?.updateAt || '').toLocaleString() }}
             </div>
@@ -19,12 +20,12 @@
                 </div>
             </div>
         </div>
-        <div class="blog-abstract">
+        <div class="blog-abstract" v-if="!loading">
             摘要：{{ blogInfo?.abstract }}
         </div>
         <div id="vditor" ref="vditorRef"></div>
         <el-divider />
-        <div class="prev-next-blog">
+        <div class="prev-next-blog" v-if="!loading">
             <div class="prev-next-row">
                 <div class="preffix">
                     上一篇：
@@ -42,14 +43,13 @@
                 </div>
             </div>
         </div>
-
-        <div class="comment-box">
+        <div class="comment-box" v-if="!loading">
             <div class="comment-header">
                 已经看到这里了，不留下点什么？
             </div>
             <CommentForm :comment-type="0" :blogId="pageBlogId" @on-success="createCommentSuccess"></CommentForm>
         </div>
-        <div>
+        <div v-if="!loading">
             <CommentList :comment-type="0" :blogId="pageBlogId" ref="commentListRef"></CommentList>
         </div>
 
@@ -66,6 +66,7 @@ import Vditor from 'vditor';
 import 'vditor/dist/index.css';
 import CommentForm from "@/components/CommentForm/index.vue";
 import CommentList from "@/components/CommentList/index.vue";
+const loading: Ref<boolean> = ref(true);
 
 onMounted(() => {
     onFetchBlogInfo();
@@ -125,7 +126,7 @@ const onFetchBlogInfo = async () => {
                 mode: "dark",
                 anchor: 1
             });
-
+            loading.value = false;
         } else {
             ElNotification({
                 title: 'Error',

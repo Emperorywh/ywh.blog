@@ -19,9 +19,20 @@
                     }}</el-checkbox>
             </el-checkbox-group>
         </div>
-        <el-alert v-if="blogSearch.blogSearchText.length > 0" :title="'搜索关键字：' + blogSearch.blogSearchText" type="success" center show-icon />
+        <el-alert v-if="blogSearch.blogSearchText.length > 0" :title="'搜索关键字：' + blogSearch.blogSearchText" type="success"
+            center show-icon />
         <div class="blog-list">
-            <BlogItem v-for="blogItem in blogResult.blogList" :blog="blogItem" :key="blogItem._id"></BlogItem>
+            <div class="blog-list-item-box" v-if="blogResult.blogList.length > 0">
+                <BlogItem v-for="blogItem in blogResult.blogList" :blog="blogItem" :key="blogItem._id"></BlogItem>
+            </div>
+            <el-skeleton v-else animated style="margin-top: 50px;">
+                <template #template>
+                    <el-skeleton-item variant="h1" style="height: 40px" />
+                    <el-skeleton-item variant="image" style="width: 100%; height: 300px" />
+                    <el-skeleton-item variant="h3" style="margin: 10px 0;" />
+                    <el-skeleton-item variant="h2" style="height: 25px" />
+                </template>
+            </el-skeleton>
         </div>
         <div class="blog-page-box">
             <el-pagination layout="prev, pager, next" :total="blogResult.total" :page-size="pageData.pageSize"

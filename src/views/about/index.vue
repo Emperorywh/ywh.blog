@@ -1,6 +1,7 @@
 <template>
     <div class="about-container">
         <div id="vditor" ref="vditorRef"></div>
+        <el-skeleton v-if="loading" animated />
         <div class="comment-box">
             <div class="comment-header">
                 已经看到这里了，不留下点什么？
@@ -26,10 +27,12 @@ onMounted(() => {
 // 富文本编辑器 dom实例
 const vditorRef = ref();
 
+const loading: Ref<boolean> = ref(true);
+
 /**
  * 评论列表ref
  */
- const commentListRef: Ref<any> = ref(null);
+const commentListRef: Ref<any> = ref(null);
 
 /**
  * 查询关于我
@@ -41,6 +44,7 @@ const onFetchAbout = async () => {
             mode: "dark",
             anchor: 1
         });
+        loading.value = false;
     }
 }
 
@@ -53,14 +57,18 @@ const createCommentSuccess = () => {
 </script>
 
 <style lang="less" scoped>
-    .comment-box {
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-        margin-top: 40px;
+.about-container {
+    padding-top: 30px;
+}
 
-        .comment-header {
-            font-size: 24px;
-        }
+.comment-box {
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    margin-top: 40px;
+
+    .comment-header {
+        font-size: 24px;
     }
+}
 </style>
 

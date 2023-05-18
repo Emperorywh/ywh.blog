@@ -23,7 +23,24 @@
                 </el-col>
             </el-row>
         </div>
-        <el-empty v-else description="暂无友情链接" />
+        <div class="friendly-list" v-else>
+            <el-row :gutter="12">
+                <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                    <el-card shadow="hover">
+                        <el-skeleton style="width: 240px" animated>
+                            <template #template>
+                                <div style="display: flex;align-items: center;margin-bottom: 10px;">
+                                    <el-skeleton-item variant="circle"
+                                        style="width: 80px;height: 80px;margin-right: 10px;" />
+                                    <el-skeleton-item variant="h3" style="width: 50%" />
+                                </div>
+                                <el-skeleton-item variant="h1" style="height: 25px;" />
+                            </template>
+                        </el-skeleton>
+                    </el-card>
+                </el-col>
+            </el-row>
+        </div>
         <!-- 友情链接 头部提示 -->
         <div class="friendly-form-header">
             <el-divider />
