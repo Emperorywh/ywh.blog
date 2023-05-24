@@ -6,11 +6,14 @@
                     <RouterLink to="/">Emperor</RouterLink>
                 </div>
                 <div class="header-search">
-                    <input ref="inputSearchRef" type="text" placeholder="搜索关键字" @keydown.enter="onSearch"/>
+                    <input ref="inputSearchRef" type="text" placeholder="搜索关键字" @keydown.enter="onSearch" />
                     <span class="iconfont icon-sousuo" @click="onSearch"></span>
                 </div>
             </div>
-            <div class="personal-signature">
+            <div class="personal-signature" v-if="personSignList.length > 0">
+                {{ personSignList[personSignIndex].content }}
+            </div>
+            <div class="personal-signature" v-else>
                 世界上只有一种真正的英雄主义，就是认清了生活的真相后还依然热爱它。——罗曼·罗兰
             </div>
             <div class="navbar-container">
@@ -27,6 +30,7 @@
 import { onMounted, ref, watch, type Ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { useBlogSearchStore } from "@/stores/blogSearch";
+import { PersonalSignaturePageQuery } from "@/api/persionSignal";
 
 const blogSearch = useBlogSearchStore();
 const inputSearchRef = ref();
@@ -36,6 +40,14 @@ interface RouterItem {
     path: string;
     name: string;
     isLayout: boolean;
+}
+
+interface IPersonSign {
+    content: string;
+    createAt: number;
+    status: number;
+    updateAt: number;
+    _id: string;
 }
 
 /**
@@ -53,20 +65,48 @@ onMounted(() => {
             })
         }
     });
+    onFetchBlogPersonSign();
 });
 
 /**
  * 点击搜索图标
  */
 const onSearch = () => {
-    if(inputSearchRef.value) {
+    if (inputSearchRef.value) {
         blogSearch.blogSearchText = inputSearchRef.value.value;
+    }
+}
+
+/**
+ * 个性签名列表
+ */
+const personSignList: Ref<IPersonSign[]> = ref([]);
+/**
+ * 个性签名下标
+ */
+const personSignIndex: Ref<number> = ref(0);
+
+/**
+ * 获取个性签名列表
+ */
+const onFetchBlogPersonSign = async () => {
+    const response = await PersonalSignaturePageQuery({
+        pageIndex: 1,
+        pageSize: 999
+    });
+    if (response.code === 200) {
+        personSignList.value = response.data.items;
     }
 }
 
 watch([router.currentRoute], () => {
     inputSearchRef.value.value = "";
     blogSearch.blogSearchText = "";
+    if (personSignIndex.value < personSignList.value.length -1) {
+        personSignIndex.value++;
+    } else {
+        personSignIndex.value = 0;
+    }
 });
 
 </script>
